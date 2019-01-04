@@ -4,8 +4,7 @@ py2048
 A cross-platform clone of 2048 using Python 2.7 and pygame.
 
 
-Dependencies
-------------
+## Dependencies
 
 ### LINUX
 
@@ -19,7 +18,6 @@ Debian/Ubuntu: `sudo apt-get install python2.7 python-pygame`
 
 Fedora: `sudo yum install python pygame`
 
-
 ### WINDOWS
 
 [Python 2.7](https://www.python.org/ftp/python/2.7.7/python-2.7.7.msi),
@@ -29,24 +27,18 @@ Fedora: `sudo yum install python pygame`
 **NOTE:** Since pygame only comes in 32-bit, the linked version of Python is
 also 32-bit. A 64-bit installation of Python will not work with pygame.
 
-
 ### MAC OS X
 
-Neither of the devs have a Mac and can attest to this, but theoretically since
-one could install
-[Python 2.7](https://www.python.org/ftp/python/2.7.7/python-2.7.7-macosx10.3.dmg)
-and
-[pygame](http://pygame.org/ftp/pygame-1.9.1release-python.org-32bit-py2.7-macosx10.3.dmg)
-(direct download) on the Mac, it should run. The game does not include any
-OS-specific code. The same thing applies to Mac as it does to Windows; you need
-the 32-bit version of Python, as pygame only comes in 32-bit. One could also
-download dependencies via MacPorts.
+None of the project developers have access to a Mac, so we cannot support macOS.
+However, since Python 2 and pygame are both available for macOS, the game should
+theoretically run, since we do not currently have any platform-specific code.
 
-The download page for Python 2.7.7 is
-[here](https://www.python.org/download/releases/2.7.7/)
-just in case I linked to the wrong one.
+## Running the Game
 
-## Extra Feature(s)
+Once you have this repository cloned or downloaded, run `main.py` from the project root.
+
+### Extra Feature(s)
+
 You can change the size of the playfield by inputting two numbers as arguments on the command line.
 This is optional. However, both must be present to affect the size.
 
