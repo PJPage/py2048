@@ -20,6 +20,7 @@ screen = pygame.display.set_mode(size)
 auto = False
 animate_percentage = 0
 last_direction = 'up'
+pygame.display.set_caption("py2048")
 
 # Board Logic
 #Allow for command-line arguments of board height and board width (4 being default)
@@ -159,10 +160,27 @@ def draw_tile(x, y, offsetx=0, offsety=0, scale=100):
 
 def draw(direction):
     global animate_percentage
-    pygame.display.set_caption("Score: " + str(board.score) + "        " + message)
+    #pygame.display.set_caption("Score: " + str(board.score) + "        " + message)
+
+    # fill the background
     screen.fill(BG_COLOR)
+
+    # buttons - we're going to replace these with Font Awesome icons
     button_restart.draw(screen)
     button_help.draw(screen)
+
+    # display the message at the bottom of the screen
+    font = pygame.font.Font(pygame.font.get_default_font(), 10) # TODO: make this size not hardcoded
+    message_text = font.render(message, True, (255, 255, 255))
+    message_rect = message_text.get_rect(center=(size[0] / 2, size[1] - 15))
+    screen.blit(message_text, message_rect)
+
+    # display the score at the bottom circle_center
+    score_text = font.render("Score: " + str(board.score), True, (255, 255, 255))
+    #score_rect = score_text.get_rect(center=(size[0] / 2, size[1] - 15))
+    screen.blit(score_text, (10, size[1] - 20))
+
+    # other board stuff
     changed = board
     ranges = {
         'left': range(board.width),
@@ -171,6 +189,7 @@ def draw(direction):
         'down': range(board.height),
     }
 
+    # figure out how we're going to animate
     if direction == 'left' or direction == 'right':
         for y in range(board.height):
             animated = False
@@ -198,6 +217,8 @@ def draw(direction):
                 elif board.get(x, y) != 0:
                     draw_tile(x, y)
     animate_percentage = min(100, animate_percentage + 12) #Make sure that the animation percentage doesn't go above 100
+
+    # flip the buffers
     pygame.display.flip()
 
 if __name__ == "__main__":
