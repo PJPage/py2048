@@ -170,7 +170,7 @@ def draw(direction):
     button_help.draw(screen)
 
     # display the message at the bottom of the screen
-    font = pygame.font.Font(pygame.font.get_default_font(), 10) # TODO: make this size not hardcoded
+    font = pygame.font.Font(pygame.font.get_default_font(), 12) # TODO: make this size not hardcoded
     message_text = font.render(message, True, (255, 255, 255))
     message_rect = message_text.get_rect(center=(size[0] / 2, size[1] - 15))
     screen.blit(message_text, message_rect)
@@ -178,7 +178,7 @@ def draw(direction):
     # display the score at the bottom circle_center
     score_text = font.render("Score: " + str(board.score), True, (255, 255, 255))
     #score_rect = score_text.get_rect(center=(size[0] / 2, size[1] - 15))
-    screen.blit(score_text, (10, size[1] - 20))
+    screen.blit(score_text, (10, size[1] - 21))
 
     # other board stuff
     changed = board
