@@ -22,14 +22,15 @@ animate_percentage = 0
 last_direction = 'up'
 
 # Board Logic
-#Allow for command-line arguments of board height and board width (4 being default)
-#Both arguments need to be filled or else something breaks when you try to move
+# Allow for command-line arguments of board height and board width (4 being default)
+# Both arguments need to be filled or else something breaks when you try to move
 try: boardw, boardh = int(sys.argv[1]), int(sys.argv[2])
 except: boardw, boardh = 4, 4
 board = Board(boardw, boardh)
-#The tile size should scale based on the larger of the board's width or height
-#(to ensure that nothing goes off of the screen)
-#NB: 4 is the default.
+
+# The tile size should scale based on the larger of the board's width or height
+# (to ensure that nothing goes off of the screen)
+# NB: 4 is the default.
 scale_factor = 4./max(board.width, board.height)
 
 # Creates a copy of the board's grid so that it can be compared against a later version
@@ -41,8 +42,8 @@ def copy(board):
 
 old_grid = copy(board)
 
+TEXT_COLOR = (255, 255, 255)
 BG_COLOR = (150, 150, 150)
-
 COLORS = [
     BG_COLOR,
     pygame.Color('#689d6a'),
@@ -76,7 +77,7 @@ def move_right(): move('right')
 def move_up(): move('up')
 def move_down(): move('down')
 
-def autoPlay(): #Random automatic 2048! Partially for debugging, partially for fun
+def autoPlay(): # Random automatic 2048! Partially for debugging, partially for fun
     if auto:
         directions = [move_up, move_right, move_left, move_down]
         random.choice(directions)()
@@ -115,17 +116,19 @@ key_action = {
 SCALE = 200
 
 
-def draw_tile(x, y, offsetx=0, offsety=0, scale=100):
-    local_scale = int(scale * scale_factor) #The scale for individual tiles is affected by the main scale factor
-    padding = int(SCALE / 20)
-    width = SCALE + padding
-    height = SCALE + padding
-    r = int(0.1 * SCALE) # Radius of the rounded corners
-    color = COLORS[board.get(x, y) % len(COLORS)]
-
+def get_rounded_rect(width, height, radius, background_color, color):
+    """
+    Returns a Surface with a rounded rectangle. The radius determines how round the corners are,
+    the background color is the color on the margins of the rectangle.
+    """
     rounded_rect = pygame.Surface((width, height))
-    rounded_rect.fill(BG_COLOR)
+    rounded_rect.fill(background_color)
 
+    # We use this variable a lot, so alias it for readability.
+    r = radius
+
+    # Represents the centers of the circles that will form the corners
+    # of the rectangle.
     circle_centers = [
         (r, r),
         (r, height - r),
@@ -133,29 +136,67 @@ def draw_tile(x, y, offsetx=0, offsety=0, scale=100):
         (width - r, height - r),
     ]
 
+    # We need two rectangles in a cross pattern to fill in the body of
+    # the rectangle without covering up the corners of the circles.
     rects = [
         (r, 0.5, width - (2 * r), height),
         (0.5, r, width, height - (2 * r)),
     ]
 
+    # Draw the circles
     for center in circle_centers:
         pygame.gfxdraw.aacircle(rounded_rect, center[0], center[1], r - 0, color)
         pygame.gfxdraw.filled_circle(rounded_rect, center[0], center[1], r - 0, color)
 
+    # Draw the rectangles
     for rect in rects:
         pygame.draw.rect(rounded_rect, color, rect)
 
-    font_size = SCALE / 5 * scale / 100
+    return rounded_rect
+
+
+def draw_centered_text(surface, text, color, font_size):
+    """
+    Draws the given text onto the given surface in the given color.
+
+    Note: This will modify the existing surface, not create a new one.
+    """
+
+    # Set the font
     font = pygame.font.Font(pygame.font.get_default_font(), font_size)
-    text = font.render(str(2 ** board.get(x, y)), True, (255, 255, 255))
-    text_rect = text.get_rect(center=(width / 2, height / 2))
-    rounded_rect.blit(text, text_rect)
+
+    # Render the text
+    rendered_text = font.render(text, True, color)
+
+    # Get the bounding box of the text
+    text_rect = rendered_text.get_rect(center=(surface.get_width() / 2, surface.get_height() / 2))
+
+    # Draw the text on the surface
+    surface.blit(rendered_text, text_rect)
+
+
+def draw_tile(x, y, offsetx=0, offsety=0, scale=100):
+    # The scale for individual tiles is affected by the main scale factor
+    local_scale = int(scale * scale_factor)
+    padding = int(SCALE / 20)
+    width = SCALE + padding
+    height = SCALE + padding
+    radius = int(0.1 * SCALE) # Radius of the rounded corners
+    color = COLORS[board.get(x, y) % len(COLORS)]
+
+    rounded_rect = get_rounded_rect(width, height, radius, BG_COLOR, color)
+
+    font_size = SCALE / 5 * scale / 100
+    text = str(2 ** board.get(x, y))
+    draw_centered_text(rounded_rect, text, TEXT_COLOR, font_size)
 
     screen.blit(
             pygame.transform.smoothscale(
                 rounded_rect,
                 (local_scale * 90 / 100, local_scale * 90 / 100)),
-            (((x * 100 + .5 * ((100 - scale) * scale_factor) + 5) + offsetx) * scale_factor, ((y * 100 + .5 * ((100 - scale) * scale_factor) + 5) + offsety) * scale_factor))
+            (((x * 100 + .5 * ((100 - scale) * scale_factor) + 5) + offsetx) * scale_factor, 
+                ((y * 100 + .5 * ((100 - scale) * scale_factor) + 5) + offsety) * scale_factor))
+
 
 def draw(direction):
     global animate_percentage
@@ -199,6 +240,7 @@ def draw(direction):
                     draw_tile(x, y)
     animate_percentage = min(100, animate_percentage + 12) #Make sure that the animation percentage doesn't go above 100
     pygame.display.flip()
+
 
 if __name__ == "__main__":
     restart()
